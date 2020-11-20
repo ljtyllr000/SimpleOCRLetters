@@ -1,0 +1,101 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>图片文字提取</title>
+    <script src="{% static 'jquery-3.3.1.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <style>
+        #avatar_file {
+            display: none;
+        }
+        #image_str{
+            resize: none;
+            with: 400px;
+            height: 10%;
+        }
+        #image_file{
+            display: none;
+        }
+        .row{
+            margin-top: 3%;
+        }
+    </style>
+</head>
+<body>
+<div>
+    {% csrf_token %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4" style="text-align: center;">
+                <h3>点击下方框上传识别图片</h3>
+            </div>
+            <br><br><br>
+            <div class="block-area upload col-md-4 col-md-offset-4">
+                <div class="alert alert-warning alert-dismissible" role="alert" style="display: none" id="error">
+                    <span id="error_text">{{ data.msg}}</span>
+                </div>
+            </div>
+            <div class="col-md-4 col-md-offset-4" style="text-align: center;">
+                <label for="image_file" >
+                    <img src="" alt="" width=500" height="400" id="source_img">
+                </label>
+                <input type="file" id="image_file">
+                <br>
+                <br>
+                <div class="form-group" >
+                    <input type="button" value="识别" class="btn btn-primary" id="btn">
+                </div>
+                <br>
+                <br>
+                <textarea id="image_str" class="form-control" rows="7"></textarea>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+<script>
+    $('#image_file').change(function () {
+        var file = $('#image_file')[0].files[0]
+        var filereader = new FileReader()
+        filereader.readAsDataURL(file)
+        filereader.onload = function () {
+            $('#source_img')[0].src = filereader.result
+        }
+    })
+
+    $('#btn').click(function () {
+        var formData = new FormData()
+        var img = $('#image_file')[0].files[0]
+        formData.append('image', img)
+        formData.append('csrfmiddlewaretoken', $('[name="csrfmiddlewaretoken"]').val())
+        console.log(formData)
+        $.ajax({
+            url: '{% url 'recognize_image' %}',
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (res) {
+                if(res.status != '200'){
+                    $('#error_text').text(res.msg);
+                    $("#error").css('display', 'block');
+                    $('#image_file').val('');
+                    setTimeout(function(){
+                        $("#error").css('display', 'none');
+                    },5000)
+                } else{
+                    $('#image_str').text(JSON.stringify(res.msg, null, 4))
+                }
+
+            }
+        })
+    })
+
+</script>
+</html>

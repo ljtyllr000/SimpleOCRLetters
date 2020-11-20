@@ -1,0 +1,17 @@
+# pycharm file
+.idea/
+*/__pycache__
+*/*/__pycache__
+*/*.py[cod]
+
+# logs
+logs
+
+# db update file
+files/
+
+# static ignore
+collectstatic
+
+# migrate files
+*/migrations/
