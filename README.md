@@ -17,7 +17,9 @@
 - ./init.sh
 - ./start.sh
 
-
+**注意：**
+数据库迁移时出现 No changes detected
+执行`python3 manage.py makemigrations --empty app01`
 
 ### 2. 识别api
 
